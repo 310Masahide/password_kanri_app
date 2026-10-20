@@ -1,0 +1,36 @@
+<div id="<%= dom_id account %>">
+  <p>
+    <strong>サービス名:</strong>
+    <%= account.service_name %>
+  </p>
+
+  <p>
+    <strong>ログインID:</strong>
+    <%= account.login_id %>
+  </p>
+
+  <p data-controller="password">
+    <strong>パスワード:</strong>
+    <input type="password" value="<%= account.password %>" readonly data-password-target="field">
+    <button type="button" data-password-target="button" data-action="password#toggle">表示</button>
+  </p>
+
+  <% if account.pwned_count.nil? %>
+    <p>流出チェック：未確認</p>
+  <% elsif account.pwned_count > 0 %>
+    <p style="color: red">⚠️ このパスワードは過去に<%= number_with_delimiter(account.pwned_count) %>回流出しています。変更をおすすめします。</p>
+  <% else %>
+    <p style="color: green">✅ 流出は見つかりませんでした</p>
+  <% end %>
+
+  <p>
+    <strong>URL:</strong>
+    <%= account.url %>
+  </p>
+
+  <p>
+    <strong>メモ:</strong>
+    <%= account.memo %>
+  </p>
+
+</div>

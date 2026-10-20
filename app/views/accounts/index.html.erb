@@ -1,0 +1,13 @@
+<h1>アカウント一覧</h1>
+
+<div id="accounts">
+  <% @accounts.each do |account| %>
+    <%= render account %>
+    <p>
+      <%= link_to "詳細", account %>
+    </p>
+  <% end %>
+</div>
+
+<%= link_to "新規登録", new_account_path %>
+

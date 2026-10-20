@@ -1,0 +1,13 @@
+ja:
+  activerecord:
+    models:
+      account: アカウント
+      user: ユーザー
+    attributes:
+      account:
+        service_name: サービス名
+        login_id: ログインID
+        password: パスワード
+        url: URL
+        memo: メモ
+        user: ユーザー
