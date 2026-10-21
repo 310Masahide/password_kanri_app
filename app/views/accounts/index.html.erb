@@ -1,13 +1,35 @@
-<h1>アカウント一覧</h1>
-
-<div id="accounts">
-  <% @accounts.each do |account| %>
-    <%= render account %>
-    <p>
-      <%= link_to "詳細", account %>
-    </p>
-  <% end %>
+<div class="d-flex justify-content-between align-items-center mb-4">
+  <h1 class="h3 mb-0">アカウント一覧</h1>
+  <%= link_to "＋ 新規登録", new_account_path, class: "btn btn-primary" %>
 </div>
 
-<%= link_to "新規登録", new_account_path %>
+<% if @accounts.empty? %>
+  <div class="text-center text-muted py-5">
+    <p>まだアカウントが登録されていません。</p>
+  </div>
+<% else %>
+  <div class="table-responsive">
+    <table class="table table-hover align-middle bg-white shadow-sm">
+      <thead class="table-light">
+        <tr>
+          <th>サービス名</th>
+          <th>ログインID</th>
+          <th>流出チェック</th>
+          <th></th>
+        </tr>
+      </thead>
+      <tbody>
+        <% @accounts.each do |account| %>
+          <tr>
+            <td class="fw-bold"><%= account.service_name %></td>
+            <td><%= account.login_id %></td>
+            <td><%= render "accounts/pwned_badge", account: account %></td>
+            <td class="text-end"><%= link_to "詳細", account, class: "btn btn-sm btn-outline-secondary" %></td>
+          </tr>
+        <% end %>
+      </tbody>
+    </table>
+  </div>
+<% end %>
+
 

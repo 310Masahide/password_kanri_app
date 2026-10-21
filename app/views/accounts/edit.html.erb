@@ -1,11 +1,11 @@
-<h1>アカウントの編集</h1>
+<div class="card shadow-sm mx-auto" style="max-width: 600px;">
+  <div class="card-body p-4">
+    <h1 class="h4 mb-4">アカウントの編集</h1>
+    <%= render "form", account: @account %>
+  </div>
+</div>
 
-<%= render "form", account: @account %>
-
-<br>
-
-<div>
+<div class="text-center mt-3">
   <%= link_to "詳細に戻る", @account %> |
   <%= link_to "一覧に戻る", accounts_path %>
 </div>
-

@@ -1,2 +1,40 @@
-<h1>Home#index</h1>
-<p>Find me in app/views/home/index.html.erb</p>
+<div class="text-center py-5">
+  <h1 class="display-6 fw-bold mb-3">🔐 パスワード管理アプリ</h1>
+  <p class="lead text-muted mb-4">サービスごとのIDとパスワードを、暗号化してまとめて管理できます。</p>
+
+  <% if user_signed_in? %>
+    <%= link_to "アカウント一覧へ", accounts_path, class: "btn btn-primary btn-lg" %>
+  <% else %>
+    <%= link_to "新規登録して始める", new_user_registration_path, class: "btn btn-primary btn-lg me-2" %>
+    <%= link_to "ログイン", new_user_session_path, class: "btn btn-outline-secondary btn-lg" %>
+  <% end %>
+</div>
+
+<div class="row g-4">
+  <div class="col-md-4">
+    <div class="card h-100 shadow-sm">
+      <div class="card-body">
+        <h2 class="h5">🔒 暗号化して保存</h2>
+        <p class="text-muted mb-0">パスワードは暗号化してデータベースに保存します。</p>
+      </div>
+    </div>
+  </div>
+  <div class="col-md-4">
+    <div class="card h-100 shadow-sm">
+      <div class="card-body">
+        <h2 class="h5">⚠️ 流出チェック</h2>
+        <p class="text-muted mb-0">登録したパスワードが過去に流出していないか、自動で調べます。</p>
+      </div>
+    </div>
+  </div>
+  <div class="col-md-4">
+    <div class="card h-100 shadow-sm">
+      <div class="card-body">
+        <h2 class="h5">👤 自分のデータだけ</h2>
+        <p class="text-muted mb-0">ログインした本人のデータだけが表示されます。</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<p class="text-center text-muted small mt-5">※ 学習用のデモアプリです。実際のパスワードは保存しないでください。</p>

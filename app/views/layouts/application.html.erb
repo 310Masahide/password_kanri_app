@@ -1,30 +1,42 @@
 <!DOCTYPE html>
-<html>
+<html lang="ja">
   <head>
-    <title>PasswordKanriApp</title>
+    <title>パスワード管理アプリ</title>
     <meta name="viewport" content="width=device-width,initial-scale=1">
     <%= csrf_meta_tags %>
     <%= csp_meta_tag %>
 
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <%= stylesheet_link_tag "application", "data-turbo-track": "reload" %>
     <%= javascript_importmap_tags %>
   </head>
 
-  <body>
-    <%= yield %>
+  <body class="bg-light">
+    <nav class="navbar navbar-dark bg-dark mb-4">
+      <div class="container">
+        <%= link_to "🔐 パスワード管理", root_path, class: "navbar-brand" %>
+        <div class="d-flex align-items-center gap-2">
+          <% if user_signed_in? %>
+            <span class="navbar-text small d-none d-sm-inline"><%= current_user.email %></span>
+            <%= link_to "一覧", accounts_path, class: "btn btn-sm btn-outline-light" %>
+            <%= button_to "ログアウト", destroy_user_session_path, method: :delete, class: "btn btn-sm btn-light" %>
+          <% else %>
+            <%= link_to "ログイン", new_user_session_path, class: "btn btn-sm btn-outline-light" %>
+            <%= link_to "新規登録", new_user_registration_path, class: "btn btn-sm btn-light" %>
+          <% end %>
+        </div>
+      </div>
+    </nav>
+
+    <main class="container pb-5">
+      <% if notice %>
+        <div class="alert alert-success"><%= notice %></div>
+      <% end %>
+      <% if alert %>
+        <div class="alert alert-danger"><%= alert %></div>
+      <% end %>
+
+      <%= yield %>
+    </main>
   </body>
-
-  <header>
-  <% if user_signed_in? %>
-    <span><%= current_user.email %> でログイン中</span>
-    <%= button_to "ログアウト", destroy_user_session_path, method: :delete %>
-  <% else %>
-    <%= link_to "新規登録", new_user_registration_path %>
-    <%= link_to "ログイン", new_user_session_path %>
-  <% end %>
-</header>
-
-<p style="color: green"><%= notice %></p>
-<p style="color: red"><%= alert %></p>
-
 </html>

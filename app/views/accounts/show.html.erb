@@ -1,9 +1,8 @@
 <%= render @account %>
 
-<div>
-  <%= link_to "編集", edit_account_path(@account) %> |
-  <%= link_to "一覧に戻る", accounts_path %>
-
-  <%= button_to "削除", @account, method: :delete, form: { data: { turbo_confirm: "本当に削除しますか？" } } %>
+<div class="d-flex gap-2">
+  <%= link_to "編集", edit_account_path(@account), class: "btn btn-primary" %>
+  <%= link_to "一覧に戻る", accounts_path, class: "btn btn-outline-secondary" %>
+  <%= button_to "削除", @account, method: :delete, class: "btn btn-outline-danger", form: { data: { turbo_confirm: "本当に削除しますか？" } } %>
 </div>
 

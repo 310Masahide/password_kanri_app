@@ -1,10 +1,8 @@
 <%= form_with(model: account) do |form| %>
   <% if account.errors.any? %>
-    <div style="color: red">
-      <h2><%= account.errors.count %>件のエラーがあります</h2>
-
-
-      <ul>
+    <div class="alert alert-danger">
+      <p class="fw-bold mb-1"><%= account.errors.count %>件のエラーがあります</p>
+      <ul class="mb-0">
         <% account.errors.each do |error| %>
           <li><%= error.full_message %></li>
         <% end %>
@@ -12,33 +10,34 @@
     </div>
   <% end %>
 
-  <div>
-    <%= form.label :service_name, style: "display: block" %>
-    <%= form.text_field :service_name %>
+  <div class="mb-3">
+    <%= form.label :service_name, class: "form-label" %>
+    <%= form.text_field :service_name, class: "form-control", placeholder: "例：Amazon" %>
   </div>
 
-  <div>
-    <%= form.label :login_id, style: "display: block" %>
-    <%= form.text_field :login_id %>
+  <div class="mb-3">
+    <%= form.label :login_id, class: "form-label" %>
+    <%= form.text_field :login_id, class: "form-control" %>
   </div>
 
-  <div data-controller="password">
-    <%= form.label :password, style: "display: block" %>
-    <%= form.password_field :password, value: account.password, data: { password_target: "field" } %>
-    <button type="button" data-password-target="button" data-action="password#toggle">表示</button>
+  <div class="mb-3">
+    <%= form.label :password, class: "form-label" %>
+    <div class="input-group" data-controller="password">
+      <%= form.password_field :password, value: account.password, class: "form-control", data: { password_target: "field" } %>
+      <button type="button" class="btn btn-outline-secondary" data-password-target="button" data-action="password#toggle">表示</button>
+    </div>
   </div>
 
-  <div>
-    <%= form.label :url, style: "display: block" %>
-    <%= form.text_field :url %>
+  <div class="mb-3">
+    <%= form.label :url, class: "form-label" %>
+    <%= form.url_field :url, class: "form-control", placeholder: "https://" %>
   </div>
 
-  <div>
-    <%= form.label :memo, style: "display: block" %>
-    <%= form.text_area :memo %>
+  <div class="mb-4">
+    <%= form.label :memo, class: "form-label" %>
+    <%= form.text_area :memo, class: "form-control", rows: 3 %>
   </div>
 
-  <div>
-    <%= form.submit %>
-  </div>
+  <%= form.submit class: "btn btn-primary w-100" %>
 <% end %>
+

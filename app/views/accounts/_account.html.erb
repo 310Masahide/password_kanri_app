@@ -1,36 +1,39 @@
-<div id="<%= dom_id account %>">
-  <p>
-    <strong>サービス名:</strong>
-    <%= account.service_name %>
-  </p>
+<div id="<%= dom_id account %>" class="card shadow-sm mb-4">
+  <div class="card-body">
+    <h1 class="h4 card-title mb-4"><%= account.service_name %></h1>
 
-  <p>
-    <strong>ログインID:</strong>
-    <%= account.login_id %>
-  </p>
+    <dl class="row mb-0">
+      <dt class="col-sm-3">ログインID</dt>
+      <dd class="col-sm-9"><%= account.login_id %></dd>
 
-  <p data-controller="password">
-    <strong>パスワード:</strong>
-    <input type="password" value="<%= account.password %>" readonly data-password-target="field">
-    <button type="button" data-password-target="button" data-action="password#toggle">表示</button>
-  </p>
+      <dt class="col-sm-3">パスワード</dt>
+      <dd class="col-sm-9">
+        <div class="input-group" style="max-width: 400px;" data-controller="password">
+          <input type="password" value="<%= account.password %>" readonly class="form-control" data-password-target="field">
+          <button type="button" class="btn btn-outline-secondary" data-password-target="button" data-action="password#toggle">表示</button>
+        </div>
+        <% if account.pwned_count.to_i > 0 %>
+          <div class="alert alert-danger mt-2 mb-0 py-2">
+            ⚠️ このパスワードは過去に<%= number_with_delimiter(account.pwned_count) %>回流出しています。変更をおすすめします。
+          </div>
+        <% end %>
+      </dd>
 
-  <% if account.pwned_count.nil? %>
-    <p>流出チェック：未確認</p>
-  <% elsif account.pwned_count > 0 %>
-    <p style="color: red">⚠️ このパスワードは過去に<%= number_with_delimiter(account.pwned_count) %>回流出しています。変更をおすすめします。</p>
-  <% else %>
-    <p style="color: green">✅ 流出は見つかりませんでした</p>
-  <% end %>
+      <dt class="col-sm-3">流出チェック</dt>
+      <dd class="col-sm-9"><%= render "accounts/pwned_badge", account: account %></dd>
 
-  <p>
-    <strong>URL:</strong>
-    <%= account.url %>
-  </p>
+      <dt class="col-sm-3">URL</dt>
+      <dd class="col-sm-9">
+        <% if account.url.to_s.match?(/\Ahttps?:\/\//) %>
+          <%= link_to account.url, account.url, target: "_blank", rel: "noopener" %>
+        <% else %>
+          <%= account.url %>
+        <% end %>
+      </dd>
 
-  <p>
-    <strong>メモ:</strong>
-    <%= account.memo %>
-  </p>
-
+      <dt class="col-sm-3">メモ</dt>
+      <dd class="col-sm-9"><%= simple_format(account.memo) %></dd>
+    </dl>
+  </div>
 </div>
+
