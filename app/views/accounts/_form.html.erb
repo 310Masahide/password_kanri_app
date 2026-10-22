@@ -25,7 +25,9 @@
     <div class="input-group" data-controller="password">
       <%= form.password_field :password, value: account.password, class: "form-control", data: { password_target: "field" } %>
       <button type="button" class="btn btn-outline-secondary" data-password-target="button" data-action="password#toggle">表示</button>
+      <button type="button" class="btn btn-outline-primary" data-action="password#generate">自動作成</button>
     </div>
+    <div class="form-text">「自動作成」を押すと、ランダムな16文字のパスワードが入ります。</div>
   </div>
 
   <div class="mb-3">
