@@ -1,7 +1,39 @@
 <div id="<%= dom_id account %>" class="card shadow-sm mb-4">
-  <div class="d-flex align-items-center gap-2" data-controller="password" data-password-secret-value="<%= account.password %>">
-    <code class="fs-6" data-password-target="field">••••••••</code>
-    <button type="button" class="btn btn-sm btn-outline-secondary" data-password-target="button" data-action="password#toggle">表示</button>
+  <div class="card-body">
+    <h1 class="h4 card-title mb-4"><%= account.service_name %></h1>
+
+    <dl class="row mb-0">
+      <dt class="col-sm-3">ログインID</dt>
+      <dd class="col-sm-9"><%= account.login_id %></dd>
+
+      <dt class="col-sm-3">パスワード</dt>
+      <dd class="col-sm-9">
+        <div class="d-flex align-items-center gap-2" data-controller="password" data-password-secret-value="<%= account.password %>">
+          <code class="fs-6" data-password-target="field">••••••••</code>
+          <button type="button" class="btn btn-sm btn-outline-secondary" data-password-target="button" data-action="password#toggle">表示</button>
+        </div>
+        <% if account.pwned_count.to_i > 0 %>
+          <div class="alert alert-danger mt-2 mb-0 py-2">
+            ⚠️ このパスワードは過去に<%= number_with_delimiter(account.pwned_count) %>回流出しています。変更をおすすめします。
+          </div>
+        <% end %>
+      </dd>
+
+      <dt class="col-sm-3">流出チェック</dt>
+      <dd class="col-sm-9"><%= render "accounts/pwned_badge", account: account %></dd>
+
+      <dt class="col-sm-3">URL</dt>
+      <dd class="col-sm-9">
+        <% if account.url.to_s.match?(/\Ahttps?:\/\//) %>
+          <%= link_to account.url, account.url, target: "_blank", rel: "noopener" %>
+        <% else %>
+          <%= account.url %>
+        <% end %>
+      </dd>
+
+      <dt class="col-sm-3">メモ</dt>
+      <dd class="col-sm-9"><%= simple_format(account.memo) %></dd>
+    </dl>
   </div>
 </div>
 
