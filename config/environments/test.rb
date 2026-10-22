@@ -31,6 +31,9 @@ Rails.application.configure do
   # Render exception templates for rescuable exceptions and raise for other exceptions.
   config.action_dispatch.show_exceptions = :rescuable
 
+  # テスト用データ（fixtures）のパスワードも暗号化して保存する
+  config.active_record.encryption.encrypt_fixtures = true
+
   # Disable request forgery protection in test environment.
   config.action_controller.allow_forgery_protection = false
 

@@ -1,48 +1,55 @@
 require "test_helper"
 
 class AccountsControllerTest < ActionDispatch::IntegrationTest
+  include Devise::Test::IntegrationHelpers
+
   setup do
-    @account = accounts(:one)
+    @alice = users(:alice)
+    @alice_account = accounts(:alice_amazon)
+    @bob_account = accounts(:bob_sns)
   end
 
-  test "should get index" do
+  test "ログインしていないと、一覧を見られずログイン画面に移動する" do
+    get accounts_url
+    assert_redirected_to new_user_session_url
+  end
+
+  test "一覧には自分のデータだけが表示される" do
+    sign_in @alice
     get accounts_url
     assert_response :success
+    assert_match @alice_account.service_name, response.body
+    assert_no_match @bob_account.service_name, response.body
   end
 
-  test "should get new" do
-    get new_account_url
-    assert_response :success
+  test "他人のデータの詳細は見られない" do
+    sign_in @alice
+    get account_url(@bob_account)
+    assert_response :not_found
   end
 
-  test "should create account" do
-    assert_difference("Account.count") do
-      post accounts_url, params: { account: { login_id: @account.login_id, memo: @account.memo, password: @account.password, service_name: @account.service_name, url: @account.url, user_id: @account.user_id } }
+  test "他人のデータは更新できない" do
+    sign_in @alice
+    patch account_url(@bob_account), params: { account: { service_name: "書き換え" } }
+    assert_response :not_found
+    assert_equal "ボブのSNS", @bob_account.reload.service_name
+  end
+
+  test "他人のデータは削除できない" do
+    sign_in @alice
+    assert_no_difference("Account.count") do
+      delete account_url(@bob_account)
     end
-
-    assert_redirected_to account_url(Account.last)
+    assert_response :not_found
   end
 
-  test "should show account" do
-    get account_url(@account)
-    assert_response :success
-  end
-
-  test "should get edit" do
-    get edit_account_url(@account)
-    assert_response :success
-  end
-
-  test "should update account" do
-    patch account_url(@account), params: { account: { login_id: @account.login_id, memo: @account.memo, password: @account.password, service_name: @account.service_name, url: @account.url, user_id: @account.user_id } }
-    assert_redirected_to account_url(@account)
-  end
-
-  test "should destroy account" do
-    assert_difference("Account.count", -1) do
-      delete account_url(@account)
+  test "登録したデータは自分のものになる（他人のuser_idを送っても無視される）" do
+    sign_in @alice
+    PwnedPasswordChecker.stub(:count, 0) do
+      assert_difference("@alice.accounts.count", 1) do
+        post accounts_url, params: { account: { service_name: "新しいサービス", password: "test1234", user_id: users(:bob).id } }
+      end
     end
-
-    assert_redirected_to accounts_url
+    assert_redirected_to account_url(@alice.accounts.last)
   end
 end

@@ -1,17 +1,16 @@
-# Read about fixtures at https://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+alice_amazon:
+  user: alice
+  service_name: アリスのショッピング
+  login_id: alice_shop
+  password: test1234
+  url: https://example.com
+  pwned_count: 0
 
-one:
-  service_name: MyString
-  login_id: MyString
-  password: MyString
-  url: MyString
-  memo: MyText
-  user: one
+bob_sns:
+  user: bob
+  service_name: ボブのSNS
+  login_id: bob_sns
+  password: test5678
+  url: https://example.com
+  pwned_count: 0
 
-two:
-  service_name: MyString
-  login_id: MyString
-  password: MyString
-  url: MyString
-  memo: MyText
-  user: two
