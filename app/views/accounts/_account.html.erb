@@ -4,13 +4,21 @@
 
     <dl class="row mb-0">
       <dt class="col-sm-3">ログインID</dt>
-      <dd class="col-sm-9"><%= account.login_id %></dd>
+      <dd class="col-sm-9">
+        <div class="d-flex align-items-center gap-2" data-controller="clipboard" data-clipboard-text-value="<%= account.login_id %>">
+          <span><%= account.login_id %></span>
+          <% if account.login_id.present? %>
+            <button type="button" class="btn btn-sm btn-outline-primary" data-action="clipboard#copy">コピー</button>
+          <% end %>
+        </div>
+      </dd>
 
       <dt class="col-sm-3">パスワード</dt>
       <dd class="col-sm-9">
-        <div class="d-flex align-items-center gap-2" data-controller="password" data-password-secret-value="<%= account.password %>">
+        <div class="d-flex align-items-center gap-2" data-controller="password clipboard" data-password-secret-value="<%= account.password %>" data-clipboard-text-value="<%= account.password %>">
           <code class="fs-6" data-password-target="field">••••••••</code>
           <button type="button" class="btn btn-sm btn-outline-secondary" data-password-target="button" data-action="password#toggle">表示</button>
+          <button type="button" class="btn btn-sm btn-outline-primary" data-action="clipboard#copy">コピー</button>
         </div>
         <% if account.pwned_count.to_i > 0 %>
           <div class="alert alert-danger mt-2 mb-0 py-2">
@@ -36,4 +44,3 @@
     </dl>
   </div>
 </div>
-

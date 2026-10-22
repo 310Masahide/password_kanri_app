@@ -3,9 +3,19 @@
   <%= link_to "＋ 新規登録", new_account_path, class: "btn btn-primary" %>
 </div>
 
+<%= form_with url: accounts_path, method: :get, class: "d-flex gap-2 mb-4" do |f| %>
+  <%= f.search_field :q, value: params[:q], class: "form-control", placeholder: "サービス名で検索" %>
+  <%= f.submit "検索", class: "btn btn-outline-primary", name: nil %>
+<% end %>
+
 <% if @accounts.empty? %>
   <div class="text-center text-muted py-5">
-    <p>まだアカウントが登録されていません。</p>
+    <% if params[:q].present? %>
+      <p>「<%= params[:q] %>」に一致するアカウントは見つかりませんでした。</p>
+      <%= link_to "検索をやめる", accounts_path %>
+    <% else %>
+      <p>まだアカウントが登録されていません。</p>
+    <% end %>
   </div>
 <% else %>
   <div class="table-responsive">
@@ -31,5 +41,3 @@
     </table>
   </div>
 <% end %>
-
-
