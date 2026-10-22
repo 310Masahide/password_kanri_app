@@ -5,12 +5,15 @@
     <dl class="row mb-0">
       <dt class="col-sm-3">ログインID</dt>
       <dd class="col-sm-9">
-        <div class="d-flex align-items-center gap-2" data-controller="clipboard" data-clipboard-text-value="<%= account.login_id %>">
-          <span><%= account.login_id %></span>
-          <% if account.login_id.present? %>
-            <button type="button" class="btn btn-sm btn-outline-primary" data-action="clipboard#copy">コピー</button>
-          <% end %>
-        </div>
+        <% if account.url.to_s.match?(/\Ahttps?:\/\//) %>
+          <div class="d-flex flex-wrap align-items-center gap-2" data-controller="clipboard" data-clipboard-text-value="<%= account.password %>">
+            <%= link_to account.url, account.url, target: "_blank", rel: "noopener" %>
+            <%= link_to "ログインページを開く（パスワードをコピー）", account.url, target: "_blank", rel: "noopener",
+                        class: "btn btn-sm btn-primary", data: { action: "clipboard#copy" } %>
+          </div>
+        <% else %>
+          <%= account.url %>
+        <% end %>
       </dd>
 
       <dt class="col-sm-3">パスワード</dt>

@@ -5,6 +5,8 @@ export default class extends Controller {
 
   async copy(event) {
     const button = event.currentTarget
+    // 元の文字を覚えておく（すでに覚えていれば、そのまま使う）
+    button.dataset.label ??= button.textContent
 
     try {
       await navigator.clipboard.writeText(this.textValue)
@@ -13,6 +15,7 @@ export default class extends Controller {
       button.textContent = "コピーできませんでした"
     }
 
-    setTimeout(() => { button.textContent = "コピー" }, 2000)
+    setTimeout(() => { button.textContent = button.dataset.label }, 2000)
   }
 }
+
