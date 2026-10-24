@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.1].define(version: 2026_10_20_114204) do
+ActiveRecord::Schema[7.1].define(version: 2026_10_24_110839) do
   create_table "accounts", force: :cascade do |t|
     t.string "service_name"
     t.string "login_id"
@@ -22,6 +22,17 @@ ActiveRecord::Schema[7.1].define(version: 2026_10_20_114204) do
     t.datetime "updated_at", null: false
     t.integer "pwned_count"
     t.index ["user_id"], name: "index_accounts_on_user_id"
+  end
+
+  create_table "api_tokens", force: :cascade do |t|
+    t.integer "user_id", null: false
+    t.string "name"
+    t.string "token_digest"
+    t.datetime "last_used_at"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["token_digest"], name: "index_api_tokens_on_token_digest", unique: true
+    t.index ["user_id"], name: "index_api_tokens_on_user_id"
   end
 
   create_table "users", force: :cascade do |t|
@@ -37,4 +48,5 @@ ActiveRecord::Schema[7.1].define(version: 2026_10_20_114204) do
   end
 
   add_foreign_key "accounts", "users"
+  add_foreign_key "api_tokens", "users"
 end

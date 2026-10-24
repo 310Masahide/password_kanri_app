@@ -4,6 +4,7 @@ class User < ApplicationRecord
   devise :database_authenticatable, :registerable,
          :rememberable, :validatable
   has_many :accounts, dependent: :destroy
+  has_many :api_tokens, dependent: :destroy
 
   GUEST_EMAIL = "guest@example.com".freeze
 

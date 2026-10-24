@@ -8,6 +8,7 @@ Rails.application.routes.draw do
   end
 
   resources :accounts
+  resources :api_tokens, only: %i[index create destroy]
   get "home/index"
   root "home#index"
 

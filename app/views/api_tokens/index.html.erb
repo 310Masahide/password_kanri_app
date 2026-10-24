@@ -1,0 +1,54 @@
+<div class="mx-auto" style="max-width: 720px;">
+  <h1 class="h3 mb-3">拡張機能の連携</h1>
+  <p class="text-muted">Chrome 拡張機能から、このアプリに登録したアカウントを使うための「トークン（合言葉）」を発行します。</p>
+
+  <% if @token %>
+    <div class="alert alert-warning">
+      <p class="fw-bold mb-2">トークンを発行しました。この画面を離れると、二度と表示されません。今すぐコピーして、拡張機能に貼り付けてください。</p>
+      <div class="input-group" data-controller="clipboard" data-clipboard-text-value="<%= @token %>">
+        <input type="text" class="form-control font-monospace" value="<%= @token %>" readonly>
+        <button type="button" class="btn btn-outline-primary" data-action="clipboard#copy">コピー</button>
+      </div>
+    </div>
+  <% end %>
+
+  <div class="card shadow-sm mb-4">
+    <div class="card-body">
+      <%= form_with url: api_tokens_path, method: :post, data: { turbo: false }, class: "d-flex gap-2" do |f| %>
+        <%= f.text_field :name, class: "form-control", placeholder: "名前（例：自宅のパソコンのChrome）" %>
+        <%= f.submit "トークンを発行", class: "btn btn-primary text-nowrap" %>
+      <% end %>
+    </div>
+  </div>
+
+  <h2 class="h5">発行済みのトークン</h2>
+  <% if @api_tokens.empty? %>
+    <p class="text-muted">まだ発行していません。</p>
+  <% else %>
+    <div class="table-responsive">
+      <table class="table bg-white shadow-sm align-middle">
+        <thead class="table-light">
+          <tr>
+            <th>名前</th>
+            <th>発行した日時</th>
+            <th>最後に使った日時</th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody>
+          <% @api_tokens.each do |api_token| %>
+            <tr>
+              <td><%= api_token.name %></td>
+              <td><%= l api_token.created_at, format: :short %></td>
+              <td><%= api_token.last_used_at ? l(api_token.last_used_at, format: :short) : "未使用" %></td>
+              <td class="text-end">
+                <%= button_to "削除", api_token_path(api_token), method: :delete, class: "btn btn-sm btn-outline-danger",
+                              form: { data: { turbo_confirm: "このトークンを削除しますか？ 拡張機能から使えなくなります。" } } %>
+              </td>
+            </tr>
+          <% end %>
+        </tbody>
+      </table>
+    </div>
+  <% end %>
+</div>

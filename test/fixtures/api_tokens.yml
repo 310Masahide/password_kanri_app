@@ -1,0 +1,4 @@
+alice_chrome:
+  user: alice
+  name: アリスのChrome
+  token_digest: <%= Digest::SHA256.hexdigest("alice-secret-token") %>
