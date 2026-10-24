@@ -52,4 +52,21 @@ class AccountsControllerTest < ActionDispatch::IntegrationTest
     end
     assert_redirected_to account_url(@alice.accounts.last)
   end
+
+  test "詳細画面に、ログインID・コピーボタン・ログインページを開くボタンが表示される" do
+    sign_in @alice
+    get account_url(@alice_account)
+    assert_response :success
+    assert_match @alice_account.login_id, response.body
+    assert_select "button[data-action='clipboard#copy']", 2
+    assert_select "a[data-action='clipboard#copy'][href='#{@alice_account.url}']", text: /ログインページを開く/
+  end
+
+  test "URLが http(s):// で始まらないときは、リンクにしない" do
+    @alice_account.update_columns(url: "javascript:alert(1)")
+    sign_in @alice
+    get account_url(@alice_account)
+    assert_response :success
+    assert_select "a[href^='javascript']", 0
+  end
 end
