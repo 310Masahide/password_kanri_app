@@ -82,6 +82,11 @@ function operateLoginForm({ action, expectedHost, loginId, password }) {
     return { ok: true, message: "ページから読み取りました。", loginId: loginField?.value, password: passwordField?.value }
   }
 
+  // 暗号化されていない（http の）ページには入力しない。試すための localhost だけは許す
+  if (location.protocol !== "https:" && location.hostname !== "localhost") {
+    return { ok: false, message: "暗号化されていない（https ではない）ページなので、入力をやめました。" }
+  }
+
   if (!passwordField) {
     if (loginField && loginId) {
       setValue(loginField, loginId)

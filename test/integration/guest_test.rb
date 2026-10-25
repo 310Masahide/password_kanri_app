@@ -43,4 +43,19 @@ class GuestTest < ActionDispatch::IntegrationTest
     end
     assert_equal 0, guest.api_tokens.count
   end
+
+  test "誰かがゲストのメールアドレスでログインに失敗し続けても、ゲストログインは使える" do
+    User.guest
+    5.times do
+      post user_session_url, params: { user: { email: User::GUEST_EMAIL, password: "wrong-password" } }
+    end
+    assert User.guest.access_locked?
+
+    PwnedPasswordChecker.stub(:count, 0) do
+      post users_guest_sign_in_url
+    end
+    assert_redirected_to accounts_url
+    get accounts_url
+    assert_response :success
+  end
 end
