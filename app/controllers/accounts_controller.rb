@@ -1,13 +1,14 @@
 class AccountsController < ApplicationController
   before_action :authenticate_user!
+  before_action :no_store
   before_action :set_account, only: %i[ show edit update destroy ]
 
-  # GET /accounts or /accounts.json
+  # GET /accounts
   def index
     @accounts = current_user.accounts.search(params[:q]).order(:service_name)
   end
 
-  # GET /accounts/1 or /accounts/1.json
+  # GET /accounts/1
   def show
   end
 
@@ -20,42 +21,30 @@ class AccountsController < ApplicationController
   def edit
   end
 
-  # POST /accounts or /accounts.json
+  # POST /accounts
   def create
     @account = current_user.accounts.build(account_params)
 
-    respond_to do |format|
-      if @account.save
-        format.html { redirect_to @account, notice: "登録しました。" }
-        format.json { render :show, status: :created, location: @account }
-      else
-        format.html { render :new, status: :unprocessable_content }
-        format.json { render json: @account.errors, status: :unprocessable_content }
-      end
+    if @account.save
+      redirect_to @account, notice: "登録しました。"
+    else
+      render :new, status: :unprocessable_content
     end
   end
 
-  # PATCH/PUT /accounts/1 or /accounts/1.json
+  # PATCH/PUT /accounts/1
   def update
-    respond_to do |format|
-      if @account.update(account_params)
-        format.html { redirect_to @account, notice: "更新しました。", status: :see_other }
-        format.json { render :show, status: :ok, location: @account }
-      else
-        format.html { render :edit, status: :unprocessable_content }
-        format.json { render json: @account.errors, status: :unprocessable_content }
-      end
+    if @account.update(account_params)
+      redirect_to @account, notice: "更新しました。", status: :see_other
+    else
+      render :edit, status: :unprocessable_content
     end
   end
 
-  # DELETE /accounts/1 or /accounts/1.json
+  # DELETE /accounts/1
   def destroy
     @account.destroy!
-
-    respond_to do |format|
-      format.html { redirect_to accounts_path, notice: "削除しました。", status: :see_other }
-      format.json { head :no_content }
-    end
+    redirect_to accounts_path, notice: "削除しました。", status: :see_other
   end
 
   private

@@ -26,4 +26,21 @@ class GuestTest < ActionDispatch::IntegrationTest
     end
     assert_redirected_to root_url
   end
+
+  test "ゲストは、拡張機能のトークンを発行できない" do
+    sign_in User.guest
+    assert_no_difference("ApiToken.count") do
+      post api_tokens_url, params: { name: "ゲストのChrome" }
+    end
+    assert_redirected_to accounts_url
+  end
+
+  test "ゲストログインすると、前の人が発行したトークンは消える" do
+    guest = User.guest
+    ApiToken.issue!(user: guest, name: "前の人のChrome")
+    PwnedPasswordChecker.stub(:count, 0) do
+      post users_guest_sign_in_url
+    end
+    assert_equal 0, guest.api_tokens.count
+  end
 end

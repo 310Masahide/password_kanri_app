@@ -1,6 +1,7 @@
 class Api::V1::BaseController < ActionController::API
   include ActionController::HttpAuthentication::Token::ControllerMethods
 
+  before_action :no_store
   before_action :authenticate_api_token!
 
   private

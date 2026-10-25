@@ -69,4 +69,17 @@ class AccountsControllerTest < ActionDispatch::IntegrationTest
     assert_response :success
     assert_select "a[href^='javascript']", 0
   end
+
+  test "パスワードが映る画面は、ブラウザに保存させない（Cache-Control: no-store）" do
+    sign_in @alice
+    get account_url(@alice_account)
+    assert_equal "no-store", response.headers["Cache-Control"]
+  end
+
+  test "JSON の形では、アカウントを取り出せない" do
+    sign_in @alice
+    get accounts_url(format: :json)
+    assert_response :not_acceptable
+    assert_not_equal "application/json", response.media_type
+  end
 end

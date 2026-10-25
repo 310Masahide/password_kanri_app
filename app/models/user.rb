@@ -19,8 +19,9 @@ class User < ApplicationRecord
     email == GUEST_EMAIL
   end
 
-  # ゲストのデータを、サンプルだけの状態に戻す
+  # ゲストのデータを、サンプルだけの状態に戻す（前の人が発行したトークンも消す）
   def reset_guest_samples!
+    api_tokens.destroy_all
     accounts.destroy_all
     accounts.create!(service_name: "サンプル：ショッピングサイト", login_id: "guest_shop",
                      password: "password", url: "https://example.com",

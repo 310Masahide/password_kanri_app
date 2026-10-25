@@ -19,7 +19,9 @@
           <% if user_signed_in? %>
             <span class="navbar-text small d-none d-sm-inline"><%= current_user.email %></span>
             <%= link_to "一覧", accounts_path, class: "btn btn-sm btn-outline-light" %>
-            <%= link_to "拡張機能", api_tokens_path, class: "btn btn-sm btn-outline-light" %>
+            <% unless current_user.guest? %>
+              <%= link_to "拡張機能", api_tokens_path, class: "btn btn-sm btn-outline-light" %>
+            <% end %>
             <%= button_to "ログアウト", destroy_user_session_path, method: :delete, class: "btn btn-sm btn-light" %>
           <% else %>
             <%= link_to "ログイン", new_user_session_path, class: "btn btn-sm btn-outline-light" %>

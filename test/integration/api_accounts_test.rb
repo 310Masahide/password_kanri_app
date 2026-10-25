@@ -66,4 +66,9 @@ class ApiAccountsTest < ActionDispatch::IntegrationTest
     end
     assert_response :unauthorized
   end
+
+  test "API の返事も、ブラウザに保存させない（Cache-Control: no-store）" do
+    get api_v1_accounts_url, params: { host: "example.com" }, headers: @headers
+    assert_equal "no-store", response.headers["Cache-Control"]
+  end
 end

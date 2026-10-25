@@ -1,5 +1,7 @@
 class ApiTokensController < ApplicationController
   before_action :authenticate_user!
+  before_action :no_store
+  before_action :ensure_normal_user
 
   def index
     @api_tokens = current_user.api_tokens.order(created_at: :desc)
@@ -15,5 +17,14 @@ class ApiTokensController < ApplicationController
   def destroy
     current_user.api_tokens.find(params[:id]).destroy!
     redirect_to api_tokens_path, notice: "トークンを削除しました。", status: :see_other
+  end
+
+  private
+
+  # ゲストユーザーは全員で共有するので、トークンを発行できないようにする
+  def ensure_normal_user
+    if current_user.guest?
+      redirect_to accounts_path, alert: "ゲストユーザーは拡張機能の連携を使えません。"
+    end
   end
 end
