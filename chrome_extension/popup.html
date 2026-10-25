@@ -10,8 +10,32 @@
 
   <div id="accounts"></div>
 
+  <details id="register" hidden>
+    <summary>このサイトを登録</summary>
+    <form id="register-form">
+      <label for="service-name">サービス名</label>
+      <input id="service-name" required>
+
+      <label for="login-id">ログインID</label>
+      <input id="login-id" autocomplete="off">
+
+      <label for="password">パスワード</label>
+      <div class="field-row">
+        <input id="password" autocomplete="off" required>
+        <button type="button" id="generate" class="secondary">自動作成</button>
+      </div>
+
+      <div class="buttons">
+        <button type="button" id="read-page" class="secondary">ページから読み取る</button>
+        <button type="submit">登録</button>
+      </div>
+    </form>
+  </details>
+  <p id="register-message" class="hint"></p>
+
   <p class="footer"><a href="#" id="open-settings">設定</a></p>
 
   <script type="module" src="popup.js"></script>
 </body>
 </html>
+
