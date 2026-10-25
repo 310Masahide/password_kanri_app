@@ -35,4 +35,35 @@ class ApiAccountsTest < ActionDispatch::IntegrationTest
     get api_v1_accounts_url, params: { host: "example.com" }, headers: @headers
     assert_not_nil api_tokens(:alice_chrome).reload.last_used_at
   end
+
+
+  test "アカウントを登録できる（持ち主はトークンの持ち主になり、送られてきた user_id は無視される）" do
+    PwnedPasswordChecker.stub(:count, 0) do
+      assert_difference("users(:alice).accounts.count", 1) do
+        post api_v1_accounts_url, headers: @headers, as: :json, params: {
+          account: { service_name: "新しいサイト", login_id: "alice_new", password: "abc12345",
+                     url: "https://new.example.com/login", user_id: users(:bob).id }
+        }
+      end
+    end
+    assert_response :created
+    assert_equal "新しいサイト", response.parsed_body["service_name"]
+    assert_equal users(:alice), Account.find(response.parsed_body["id"]).user
+  end
+
+  test "サービス名が空だと登録せず、422 とエラーの内容を返す" do
+    assert_no_difference("Account.count") do
+      post api_v1_accounts_url, headers: @headers, as: :json,
+                                params: { account: { service_name: "", password: "abc12345" } }
+    end
+    assert_response :unprocessable_content
+    assert_includes response.parsed_body["errors"], "サービス名を入力してください"
+  end
+
+  test "トークンがないと登録できない" do
+    assert_no_difference("Account.count") do
+      post api_v1_accounts_url, as: :json, params: { account: { service_name: "新しいサイト", password: "abc12345" } }
+    end
+    assert_response :unauthorized
+  end
 end
