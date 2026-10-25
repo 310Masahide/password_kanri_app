@@ -31,4 +31,13 @@ class AccountTest < ActiveSupport::TestCase
       account.update!(memo: "メモだけ変更")
     end
   end
+
+  test "長すぎる値は保存できない" do
+    account = users(:alice).accounts.build(service_name: "あ" * 101, password: "test1234")
+    assert_not account.valid?
+    assert_includes account.errors.full_messages, "サービス名は100文字以内で入力してください"
+
+    account = users(:alice).accounts.build(service_name: "テスト", password: "test1234", memo: "あ" * 1001)
+    assert_not account.valid?
+  end
 end

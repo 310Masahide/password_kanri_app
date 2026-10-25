@@ -2,8 +2,11 @@ class Account < ApplicationRecord
   belongs_to :user
   encrypts :password
 
-  validates :service_name, presence: true
-  validates :password, presence: true
+  validates :service_name, presence: true, length: { maximum: 100 }
+  validates :login_id, length: { maximum: 255 }
+  validates :password, presence: true, length: { maximum: 255 }
+  validates :url, length: { maximum: 2048 }
+  validates :memo, length: { maximum: 1000 }
 
   before_save :check_pwned_password, if: -> { will_save_change_to_password? || pwned_count.nil? }
 

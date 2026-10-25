@@ -71,4 +71,11 @@ class ApiAccountsTest < ActionDispatch::IntegrationTest
     get api_v1_accounts_url, params: { host: "example.com" }, headers: @headers
     assert_equal "no-store", response.headers["Cache-Control"]
   end
+
+  test "有効期限が切れたトークンは使えない" do
+    travel 91.days do
+      get api_v1_accounts_url, params: { host: "example.com" }, headers: @headers
+      assert_response :unauthorized
+    end
+  end
 end
