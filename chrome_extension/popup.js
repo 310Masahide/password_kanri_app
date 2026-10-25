@@ -1,3 +1,5 @@
+import { loadSettings, callApi, fetchAccounts, runInPage } from "./lib.js"
+
 const hostElement = document.getElementById("host")
 const accountsElement = document.getElementById("accounts")
 const settingsLink = document.getElementById("open-settings")
@@ -30,11 +32,11 @@ function showMessage(text) {
 // 今開いているタブと、保存してある設定を調べる
 const [tab] = await chrome.tabs.query({ active: true, currentWindow: true })
 const url = new URL(tab.url)
-const { server, token } = await chrome.storage.local.get(["server", "token"])
+const settings = await loadSettings()
 
 if (!url.protocol.startsWith("http")) {
   hostElement.textContent = "（このページでは使えません）"
-} else if (!server || !token) {
+} else if (!settings.server || !settings.token) {
   hostElement.textContent = url.hostname
   showMessage("先に「設定」で、アプリの URL とトークンを保存してください。")
 } else {
@@ -44,42 +46,21 @@ if (!url.protocol.startsWith("http")) {
   await showAccounts()
 }
 
-// アプリの API を呼ぶ（トークンを付けて送る）
-function callApi(path, options = {}) {
-  return fetch(`${server}${path}`, {
-    ...options,
-    headers: { Authorization: `Bearer ${token}`, "Content-Type": "application/json", ...options.headers }
-  })
-}
-
-// アプリの API に問い合わせて、このサイトのアカウントを一覧にする
+// このサイトのアカウントを一覧にする
 async function showAccounts() {
   showMessage("探しています…")
 
-  let accounts
-  try {
-    const response = await callApi(`/api/v1/accounts?host=${encodeURIComponent(url.hostname)}`)
-
-    if (response.status === 401) {
-      showMessage("トークンが正しくありません。「設定」を確かめてください。")
-      return
-    }
-    if (!response.ok) {
-      showMessage(`エラーになりました（${response.status}）。`)
-      return
-    }
-    accounts = await response.json()
-  } catch {
-    showMessage("アプリにつながりませんでした。")
+  const result = await fetchAccounts(settings, url.hostname)
+  if (!result.ok) {
+    showMessage(result.message)
     return
   }
-
-  if (accounts.length === 0) {
+  if (result.accounts.length === 0) {
     showMessage("このサイトのアカウントは登録されていません。")
     return
   }
 
-  accountsElement.replaceChildren(...accounts.map(accountRow))
+  accountsElement.replaceChildren(...result.accounts.map(accountRow))
 }
 
 // アカウント1件分の表示を作る
@@ -98,27 +79,13 @@ function accountRow(account) {
   const button = document.createElement("button")
   button.textContent = "入力"
   button.addEventListener("click", async () => {
-    const result = await runInPage({ action: "fill", loginId: account.login_id || "", password: account.password })
+    const result = await runInPage(tab, { action: "fill", loginId: account.login_id || "", password: account.password })
     showMessage(result.message)
     if (result.ok) setTimeout(() => window.close(), 1000)
   })
 
   row.append(info, button)
   return row
-}
-
-// 開いているページの中で、ログインフォームを操作する
-async function runInPage(request) {
-  try {
-    const [result] = await chrome.scripting.executeScript({
-      target: { tabId: tab.id },
-      func: operateLoginForm,
-      args: [{ ...request, expectedHost: url.hostname }]
-    })
-    return result.result
-  } catch {
-    return { ok: false, message: "このページは操作できませんでした。" }
-  }
 }
 
 // 強いパスワードを作る
@@ -130,7 +97,7 @@ generateButton.addEventListener("click", () => {
 
 // ページのフォームに入力されている、ログインIDとパスワードを読み取る
 readPageButton.addEventListener("click", async () => {
-  const result = await runInPage({ action: "read" })
+  const result = await runInPage(tab, { action: "read" })
   registerMessage.textContent = result.message
   if (!result.ok) return
 
@@ -144,7 +111,7 @@ registerForm.addEventListener("submit", async (event) => {
   registerMessage.textContent = "登録しています…"
 
   try {
-    const response = await callApi("/api/v1/accounts", {
+    const response = await callApi(settings, "/api/v1/accounts", {
       method: "POST",
       body: JSON.stringify({
         account: {
@@ -172,54 +139,3 @@ registerForm.addEventListener("submit", async (event) => {
     registerMessage.textContent = "アプリにつながりませんでした。"
   }
 })
-
-// ログインフォームを操作する（この関数は、開いているページの中で動く）
-// action が "fill" なら入力し、"read" なら入力されている値を読み取る
-function operateLoginForm({ action, expectedHost, loginId, password }) {
-  // ボタンを押すまでのあいだに、別のサイトに移動していたら何もしない
-  if (location.hostname !== expectedHost) {
-    return { ok: false, message: "ページが変わったため、やめました。" }
-  }
-
-  const isUsable = (input) => input.offsetParent !== null && !input.disabled && !input.readOnly
-
-  // React などで作られたサイトにも入力が伝わるように、値を入れてから「入力した」と知らせる
-  const setValue = (input, value) => {
-    Object.getOwnPropertyDescriptor(HTMLInputElement.prototype, "value").set.call(input, value)
-    input.dispatchEvent(new Event("input", { bubbles: true }))
-    input.dispatchEvent(new Event("change", { bubbles: true }))
-  }
-
-  const textInputs = (scope) =>
-    [...scope.querySelectorAll('input[type="email"], input[type="text"], input[type="tel"], input:not([type])')]
-      .filter(isUsable)
-
-  const passwordField = [...document.querySelectorAll('input[type="password"]')].find(isUsable)
-
-  // パスワードの欄より前にある、いちばん近い欄を、ログインIDの欄とみなす
-  // （パスワードの欄がない画面では、最初の入力欄をログインIDの欄とみなす）
-  const loginField = passwordField
-    ? textInputs(passwordField.form || document)
-        .filter((input) => input.compareDocumentPosition(passwordField) & Node.DOCUMENT_POSITION_FOLLOWING)
-        .pop()
-    : textInputs(document)[0]
-
-  if (action === "read") {
-    if (!loginField?.value && !passwordField?.value) {
-      return { ok: false, message: "ページに入力されている内容が見つかりませんでした。" }
-    }
-    return { ok: true, message: "ページから読み取りました。", loginId: loginField?.value, password: passwordField?.value }
-  }
-
-  if (!passwordField) {
-    if (loginField && loginId) {
-      setValue(loginField, loginId)
-      return { ok: true, message: "ログインIDを入力しました。" }
-    }
-    return { ok: false, message: "入力欄が見つかりませんでした。" }
-  }
-
-  if (loginField && loginId) setValue(loginField, loginId)
-  setValue(passwordField, password)
-  return { ok: true, message: "入力しました。" }
-}
