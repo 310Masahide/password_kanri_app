@@ -1,0 +1,69 @@
+body {
+  font-family: -apple-system, BlinkMacSystemFont, "Hiragino Sans", sans-serif;
+  color: #212529;
+  margin: 0;
+  padding: 16px;
+}
+
+h1 {
+  font-size: 16px;
+  margin: 0 0 12px;
+}
+
+.popup {
+  width: 320px;
+}
+
+.options {
+  max-width: 480px;
+  margin: 24px auto;
+}
+
+label {
+  display: block;
+  font-weight: bold;
+  margin: 16px 0 4px;
+}
+
+select,
+input {
+  box-sizing: border-box;
+  width: 100%;
+  padding: 8px;
+  border: 1px solid #ced4da;
+  border-radius: 6px;
+  font-size: 14px;
+}
+
+button {
+  padding: 8px 16px;
+  border: 1px solid #0d6efd;
+  border-radius: 6px;
+  background: #0d6efd;
+  color: #fff;
+  font-size: 14px;
+  cursor: pointer;
+}
+
+button.secondary {
+  background: #fff;
+  color: #0d6efd;
+}
+
+.buttons {
+  display: flex;
+  gap: 8px;
+  margin-top: 16px;
+}
+
+.hint {
+  color: #6c757d;
+  font-size: 12px;
+  margin: 4px 0;
+}
+
+.footer {
+  margin: 12px 0 0;
+  font-size: 12px;
+  text-align: right;
+}

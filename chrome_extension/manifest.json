@@ -1,0 +1,16 @@
+{
+  "manifest_version": 3,
+  "name": "パスワード管理アプリ 連携",
+  "version": "0.1.0",
+  "description": "パスワード管理アプリに登録したIDとパスワードを、ログイン画面に入力します。",
+  "action": {
+    "default_title": "パスワード管理アプリ",
+    "default_popup": "popup.html"
+  },
+  "options_page": "options.html",
+  "permissions": ["storage", "activeTab", "scripting"],
+  "host_permissions": [
+    "http://localhost:3000/*",
+    "https://password-kanri-app.onrender.com/*"
+  ]
+}
