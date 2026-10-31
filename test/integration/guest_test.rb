@@ -11,6 +11,20 @@ class GuestTest < ActionDispatch::IntegrationTest
     assert_equal 2, User.guest.accounts.count
   end
 
+  test "ゲストログインでは、流出チェックの API を呼ばない（サンプルの結果は固定の値）" do
+    PwnedPasswordChecker.stub(:count, ->(_password) { flunk "APIを呼んではいけない" }) do
+      post users_guest_sign_in_url
+    end
+    assert_operator User.guest.accounts.find_by!(login_id: "guest_shop").pwned_count, :>, 0
+    assert_equal 0, User.guest.accounts.find_by!(login_id: "guest_sns").pwned_count
+  end
+
+  test "ゲストの登録画面には、本物のパスワードを登録しないように注意書きが出る" do
+    sign_in User.guest
+    get new_account_url
+    assert_select ".alert-warning", text: /本物のパスワードは登録しないでください/
+  end
+
   test "ゲストは登録情報を変更できない" do
     guest = User.guest
     sign_in guest

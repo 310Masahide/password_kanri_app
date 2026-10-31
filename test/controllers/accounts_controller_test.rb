@@ -22,6 +22,28 @@ class AccountsControllerTest < ActionDispatch::IntegrationTest
     assert_no_match @bob_account.service_name, response.body
   end
 
+  test "登録画面のパスワード欄は、ブラウザに保存済みのパスワードを自動で入れさせない" do
+    sign_in @alice
+    get new_account_url
+    assert_select "input[type=password][autocomplete=new-password]"
+    assert_select ".alert-warning", count: 0
+  end
+
+  test "画面には、読み込んでよいものを決める CSP のヘッダーが付く" do
+    sign_in @alice
+    get account_url(@alice_account)
+    csp = response.headers["Content-Security-Policy"]
+    assert_match "script-src 'self'", csp
+    assert_match "frame-ancestors 'none'", csp
+  end
+
+  test "初めて来た人の画面でも、JavaScript を読み込むための合言葉（nonce）が空にならない" do
+    get new_user_session_url
+    nonce = css_select("script[type=importmap]").first["nonce"]
+    assert nonce.present?
+    assert_match "'nonce-#{nonce}'", response.headers["Content-Security-Policy"]
+  end
+
   test "他人のデータの詳細は見られない" do
     sign_in @alice
     get account_url(@bob_account)

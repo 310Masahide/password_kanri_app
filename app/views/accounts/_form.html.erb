@@ -1,4 +1,8 @@
 <%= form_with(model: account) do |form| %>
+  <% if current_user.guest? %>
+    <div class="alert alert-warning">ゲストは全員で共有するアカウントです。本物のパスワードは登録しないでください。</div>
+  <% end %>
+
   <% if account.errors.any? %>
     <div class="alert alert-danger">
       <p class="fw-bold mb-1"><%= account.errors.count %>件のエラーがあります</p>
@@ -23,7 +27,7 @@
   <div class="mb-3">
     <%= form.label :password, class: "form-label" %>
     <div class="input-group" data-controller="password">
-      <%= form.password_field :password, value: account.password, class: "form-control", data: { password_target: "field" } %>
+      <%= form.password_field :password, value: account.password, autocomplete: "new-password", class: "form-control", data: { password_target: "field" } %>
       <button type="button" class="btn btn-outline-secondary" data-password-target="button" data-action="password#toggle">表示</button>
       <button type="button" class="btn btn-outline-primary" data-action="password#generate">自動作成</button>
     </div>

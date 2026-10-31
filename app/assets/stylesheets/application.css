@@ -13,3 +13,9 @@
  *= require_tree .
  *= require_self
  */
+
+/* 画面の横幅の上限（CSP で style="..." の直書きを禁止しているので、クラスにしている） */
+.mw-420 { max-width: 420px; }
+.mw-480 { max-width: 480px; }
+.mw-600 { max-width: 600px; }
+.mw-720 { max-width: 720px; }

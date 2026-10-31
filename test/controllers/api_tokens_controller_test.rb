@@ -13,7 +13,8 @@ class ApiTokensControllerTest < ActionDispatch::IntegrationTest
     assert_difference("users(:alice).api_tokens.count", 1) do
       post api_tokens_url, params: { name: "テスト用" }
     end
-    assert_response :success
+    assert_redirected_to api_tokens_url
+    follow_redirect!
     token = css_select("input.font-monospace").first["value"]
     assert_equal 43, token.length
     assert_equal ApiToken.digest(token), ApiToken.last.token_digest
@@ -22,6 +23,15 @@ class ApiTokensControllerTest < ActionDispatch::IntegrationTest
 
     get api_tokens_url
     assert_no_match token, response.body
+  end
+
+  test "発行したあとに画面を再読み込みしても、トークンはもう1本発行されない" do
+    sign_in users(:alice)
+    post api_tokens_url, params: { name: "テスト用" }
+    follow_redirect!
+    assert_no_difference("ApiToken.count") do
+      get api_tokens_url
+    end
   end
 
   test "他人のトークンは削除できない" do
