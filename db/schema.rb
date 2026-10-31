@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.1].define(version: 2026_10_25_082202) do
+ActiveRecord::Schema[7.1].define(version: 2026_10_31_100000) do
   create_table "accounts", force: :cascade do |t|
     t.string "service_name"
     t.string "login_id"
@@ -21,6 +21,9 @@ ActiveRecord::Schema[7.1].define(version: 2026_10_25_082202) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.integer "pwned_count"
+    t.string "password_fingerprint"
+    t.datetime "pwned_checked_at"
+    t.index ["user_id", "password_fingerprint"], name: "index_accounts_on_user_id_and_password_fingerprint"
     t.index ["user_id"], name: "index_accounts_on_user_id"
   end
 

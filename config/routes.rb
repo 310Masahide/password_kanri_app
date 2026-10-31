@@ -7,7 +7,9 @@ Rails.application.routes.draw do
     post "users/guest_sign_in", to: "users/sessions#guest_sign_in"
   end
 
-  resources :accounts
+  resources :accounts do
+    post :recheck, on: :member
+  end
   resources :api_tokens, only: %i[index create destroy]
 
   namespace :api do

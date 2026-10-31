@@ -44,6 +44,46 @@ class AccountsControllerTest < ActionDispatch::IntegrationTest
     assert_match "'nonce-#{nonce}'", response.headers["Content-Security-Policy"]
   end
 
+  test "同じパスワードのアカウントは、一覧にバッジ、詳細に注意が出る" do
+    sign_in @alice
+    get accounts_url
+    assert_select ".badge", text: "使い回し", count: 0
+
+    account = PwnedPasswordChecker.stub(:count, 0) do
+      @alice.accounts.create!(service_name: "同じパスワード1", password: "same-password")
+      @alice.accounts.create!(service_name: "同じパスワード2", password: "same-password")
+    end
+    get accounts_url
+    assert_select ".badge", text: "使い回し", count: 2
+    get account_url(account)
+    assert_select ".alert-warning", text: /ほかの1件のアカウントと同じパスワードです/
+  end
+
+  test "再チェックのボタンで、流出チェックをやり直せる" do
+    sign_in @alice
+    PwnedPasswordChecker.stub(:count, 7) do
+      post recheck_account_url(@alice_account)
+    end
+    assert_redirected_to account_url(@alice_account)
+    assert_equal 7, @alice_account.reload.pwned_count
+  end
+
+  test "再チェックができなかったときは、そのことを伝える" do
+    sign_in @alice
+    PwnedPasswordChecker.stub(:count, nil) do
+      post recheck_account_url(@alice_account)
+    end
+    follow_redirect!
+    assert_select ".alert-danger", text: /前回の結果のままです/
+    assert_equal 0, @alice_account.reload.pwned_count
+  end
+
+  test "他人のデータは再チェックできない" do
+    sign_in @alice
+    post recheck_account_url(@bob_account)
+    assert_response :not_found
+  end
+
   test "他人のデータの詳細は見られない" do
     sign_in @alice
     get account_url(@bob_account)

@@ -25,10 +25,10 @@ class User < ApplicationRecord
     api_tokens.destroy_all
     accounts.destroy_all
     accounts.create!(service_name: "サンプル：ショッピングサイト", login_id: "guest_shop",
-                     password: "password", pwned_count: 52_372_427, url: "https://example.com",
+                     password: "password", pwned_count: 52_372_427, pwned_checked_at: Time.current, url: "https://example.com",
                      memo: "よく使われるパスワードの例です。流出チェックで警告が出ます。")
     accounts.create!(service_name: "サンプル：SNS", login_id: "guest_sns",
-                     password: SecureRandom.base64(12), pwned_count: 0, url: "https://example.com",
+                     password: SecureRandom.base64(12), pwned_count: 0, pwned_checked_at: Time.current, url: "https://example.com",
                      memo: "ランダムに作った強いパスワードの例です。")
   end
 end

@@ -25,10 +25,23 @@
             ⚠️ このパスワードは過去に<%= number_with_delimiter(account.pwned_count) %>回流出しています。変更をおすすめします。
           </div>
         <% end %>
+        <% if account.reused_count > 0 %>
+          <div class="alert alert-warning mt-2 mb-0 py-2">
+            ⚠️ ほかの<%= account.reused_count %>件のアカウントと同じパスワードです。サイトごとに変えることをおすすめします。
+          </div>
+        <% end %>
       </dd>
 
       <dt class="col-sm-3">流出チェック</dt>
-      <dd class="col-sm-9"><%= render "accounts/pwned_badge", account: account %></dd>
+      <dd class="col-sm-9">
+        <div class="d-flex flex-wrap align-items-center gap-2">
+          <%= render "accounts/pwned_badge", account: account %>
+          <% if account.pwned_checked_at %>
+            <span class="small text-muted"><%= l account.pwned_checked_at.to_date, format: :short %> に確認</span>
+          <% end %>
+          <%= button_to "今すぐ再チェック", recheck_account_path(account), class: "btn btn-sm btn-outline-secondary" %>
+        </div>
+      </dd>
 
       <dt class="col-sm-3">URL</dt>
       <dd class="col-sm-9">

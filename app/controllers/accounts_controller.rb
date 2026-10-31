@@ -1,11 +1,12 @@
 class AccountsController < ApplicationController
   before_action :authenticate_user!
   before_action :no_store
-  before_action :set_account, only: %i[ show edit update destroy ]
+  before_action :set_account, only: %i[ show edit update destroy recheck ]
 
   # GET /accounts
   def index
     @accounts = current_user.accounts.search(params[:q]).order(:service_name)
+    @reused_fingerprints = current_user.accounts.reused_fingerprints
   end
 
   # GET /accounts/1
@@ -45,6 +46,15 @@ class AccountsController < ApplicationController
   def destroy
     @account.destroy!
     redirect_to accounts_path, notice: "削除しました。", status: :see_other
+  end
+
+  # POST /accounts/1/recheck
+  def recheck
+    if @account.recheck_pwned!
+      redirect_to @account, notice: "流出チェックをやり直しました。", status: :see_other
+    else
+      redirect_to @account, alert: "流出チェックができませんでした。前回の結果のままです。", status: :see_other
+    end
   end
 
   private

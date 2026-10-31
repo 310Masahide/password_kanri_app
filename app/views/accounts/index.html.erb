@@ -24,7 +24,7 @@
         <tr>
           <th>サービス名</th>
           <th>ログインID</th>
-          <th>流出チェック</th>
+          <th>チェック結果</th>
           <th></th>
         </tr>
       </thead>
@@ -33,7 +33,12 @@
           <tr>
             <td class="fw-bold"><%= account.service_name %></td>
             <td><%= account.login_id %></td>
-            <td><%= render "accounts/pwned_badge", account: account %></td>
+            <td>
+              <%= render "accounts/pwned_badge", account: account %>
+              <% if @reused_fingerprints.include?(account.password_fingerprint) %>
+                <span class="badge text-bg-warning">使い回し</span>
+              <% end %>
+            </td>
             <td class="text-end"><%= link_to "詳細", account, class: "btn btn-sm btn-outline-secondary" %></td>
           </tr>
         <% end %>
