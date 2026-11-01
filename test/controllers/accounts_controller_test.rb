@@ -84,6 +84,19 @@ class AccountsControllerTest < ActionDispatch::IntegrationTest
     assert_response :not_found
   end
 
+  test "パスワードが映る画面は、Turbo の一時保存の対象にしない" do
+    sign_in @alice
+    get account_url(@alice_account)
+    assert_select "meta[name=turbo-cache-control][content=no-cache]", visible: false
+  end
+
+  test "ログインIDやメモは、ログに残さない" do
+    filter = ActiveSupport::ParameterFilter.new(Rails.application.config.filter_parameters)
+    filtered = filter.filter(account: { service_name: "A", login_id: "id", password: "pw", url: "https://example.com", memo: "メモ" })
+    assert_equal "A", filtered[:account][:service_name]
+    %i[login_id password url memo].each { |key| assert_equal "[FILTERED]", filtered[:account][key] }
+  end
+
   test "他人のデータの詳細は見られない" do
     sign_in @alice
     get account_url(@bob_account)
