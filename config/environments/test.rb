@@ -34,6 +34,11 @@ Rails.application.configure do
   # テスト用データ（fixtures）のパスワードも暗号化して保存する
   config.active_record.encryption.encrypt_fixtures = true
 
+  # テスト専用のダミー鍵（本番の鍵とは別物）。clone した環境でもテストが通るようにする
+  config.active_record.encryption.primary_key = "test-only-primary-key-0123456789ab"
+  config.active_record.encryption.deterministic_key = "test-only-deterministic-key-01234"
+  config.active_record.encryption.key_derivation_salt = "test-only-key-derivation-salt-012"
+
   # Disable request forgery protection in test environment.
   config.action_controller.allow_forgery_protection = false
 
