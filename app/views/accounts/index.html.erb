@@ -3,6 +3,21 @@
   <%= link_to "＋ 新規登録", new_account_path, class: "btn btn-primary" %>
 </div>
 
+<% if @pwned_total > 0 || @reused_total > 0 %>
+  <div class="alert alert-warning d-flex flex-wrap align-items-center gap-2">
+    <span class="me-1">見直しをおすすめするアカウントがあります</span>
+    <% if @pwned_total > 0 %>
+      <%= link_to "流出あり #{@pwned_total}件", accounts_path(filter: "pwned"), class: "btn btn-sm btn-danger" %>
+    <% end %>
+    <% if @reused_total > 0 %>
+      <%= link_to "使い回し #{@reused_total}件", accounts_path(filter: "reused"), class: "btn btn-sm btn-warning" %>
+    <% end %>
+    <% if params[:filter].present? %>
+      <%= link_to "すべて表示", accounts_path, class: "btn btn-sm btn-outline-secondary" %>
+    <% end %>
+  </div>
+<% end %>
+
 <%= form_with url: accounts_path, method: :get, class: "d-flex gap-2 mb-4" do |f| %>
   <%= f.search_field :q, value: params[:q], class: "form-control", placeholder: "サービス名で検索" %>
   <%= f.submit "検索", class: "btn btn-outline-primary", name: nil %>
@@ -13,8 +28,12 @@
     <% if params[:q].present? %>
       <p>「<%= params[:q] %>」に一致するアカウントは見つかりませんでした。</p>
       <%= link_to "検索をやめる", accounts_path %>
+    <% elsif params[:filter].present? %>
+      <p>当てはまるアカウントはありません。</p>
+      <%= link_to "すべて表示", accounts_path %>
     <% else %>
       <p>まだアカウントが登録されていません。</p>
+      <%= link_to "最初のアカウントを登録する", new_account_path, class: "btn btn-primary" %>
     <% end %>
   </div>
 <% else %>
@@ -39,7 +58,7 @@
                 <span class="badge text-bg-warning">使い回し</span>
               <% end %>
             </td>
-            <td class="text-end"><%= link_to "詳細", account, class: "btn btn-sm btn-outline-secondary" %></td>
+            <td class="text-end"><%= link_to "詳細", account, class: "btn btn-sm btn-outline-secondary text-nowrap" %></td>
           </tr>
         <% end %>
       </tbody>

@@ -185,4 +185,30 @@ class AccountsControllerTest < ActionDispatch::IntegrationTest
     assert_response :not_acceptable
     assert_not_equal "application/json", response.media_type
   end
+
+    test "流出ありのアカウントだけにしぼり込める" do
+    sign_in @alice
+    @alice_account.update_columns(pwned_count: 5, pwned_checked_at: Time.current)
+    @alice.accounts.create!(service_name: "安全なサイト", password: "another-pass", pwned_count: 0, pwned_checked_at: Time.current)
+    get accounts_url(filter: "pwned")
+    assert_match @alice_account.service_name, response.body
+    assert_no_match "安全なサイト", response.body
+    assert_select "a", text: "流出あり 1件"
+  end
+
+  test "使い回しのアカウントだけにしぼり込める" do
+    sign_in @alice
+    2.times { |i| @alice.accounts.create!(service_name: "同じ#{i}", password: "same-password", pwned_count: 0, pwned_checked_at: Time.current) }
+    get accounts_url(filter: "reused")
+    assert_match "同じ0", response.body
+    assert_no_match @alice_account.service_name, response.body
+    assert_select "a", text: "使い回し 2件"
+  end
+
+  test "アカウントがないときは、登録ボタンを出す" do
+    sign_in @alice
+    @alice.accounts.destroy_all
+    get accounts_url
+    assert_select "a", text: "最初のアカウントを登録する"
+  end
 end
