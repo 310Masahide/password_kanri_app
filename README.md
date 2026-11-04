@@ -9,6 +9,12 @@
 > ※ 学習用のデモアプリです。実際のパスワードは保存しないでください。
 > ※ 無料プランのため、しばらく使われていないと最初の表示に30秒〜1分ほどかかります。
 
+<img src="docs/images/index.png" alt="アカウント一覧" width="700">
+
+| 詳細画面 | 新規登録（パスワードの自動作成） |
+| --- | --- |
+| <img src="docs/images/show.png" alt="詳細画面" width="340"> | <img src="docs/images/new.png" alt="新規登録" width="340"> |
+
 ## 作った理由
 
 昨今の顧客情報流出のニュースから、パスワードを使い回す危険性と、長く複雑なパスワードを使う必要性を感じて作りました。
@@ -33,7 +39,6 @@
 - 一覧の上に、流出あり・使い回しの件数を表示し、押すとそのアカウントだけにしぼり込める
 - コピーしたパスワードは、30秒後にクリップボードから消える（その間に別のアプリに移ったときは消えません）
 
-
 ## 使用技術
 
 | 分類                 | 技術                                                     |
@@ -47,6 +52,40 @@
 | インフラ             | Render                                                   |
 | 拡張機能             | Chrome 拡張機能（Manifest V3） / トークン認証の JSON API |
 | テスト               | Minitest                                                 |
+
+## テーブル設計
+
+```mermaid
+erDiagram
+  users ||--o{ accounts : "持つ"
+  users ||--o{ api_tokens : "発行する"
+
+  users {
+    string email "ログイン用"
+    string encrypted_password "ハッシュ化（bcrypt）"
+    integer failed_attempts "ログイン失敗の回数"
+    datetime locked_at "ロックした日時"
+  }
+  accounts {
+    integer user_id
+    string service_name
+    string login_id
+    string password "暗号化（Active Record Encryption）"
+    string url
+    text memo
+    integer pwned_count "流出した回数"
+    datetime pwned_checked_at "流出チェックをした日時"
+    datetime pwned_check_requested_at "流出チェックを予約した日時"
+    string password_fingerprint "使い回し検知用の指紋（HMAC-SHA256）"
+  }
+  api_tokens {
+    integer user_id
+    string name "どの端末用か"
+    string token_digest "ハッシュ化（SHA-256）"
+    datetime expires_at "有効期限（90日）"
+    datetime last_used_at
+  }
+```
 
 ## セキュリティで工夫したこと
 
@@ -75,6 +114,23 @@ API から返ってきた候補の一覧と、残りの35文字をアプリの�
 - 流出した情報は日々増えるので、前に調べてから7日たったものは、一覧を開いたときに裏で調べ直します。無料の Render には定期実行（cron）がないため、この形にしました
 - 予約した日時を記録して、一覧を何度開いても同じチェックを二重に予約しないようにしています。予約から1時間たっても結果が出ていなければ、もう一度予約します（サーバーの再起動でジョブが消えたときのため）
 - 詳細画面のボタンでも、いつでも調べ直せます。調べられなかったときは、前回の結果を残します
+
+```mermaid
+sequenceDiagram
+  actor U as ユーザー
+  participant A as アプリ
+  participant J as ジョブ（裏の処理）
+  participant H as Have I Been Pwned
+
+  U->>A: パスワードを保存
+  A->>J: アカウントの ID だけを渡して予約
+  A-->>U: すぐに画面を返す（「確認中」）
+  J->>J: パスワードを SHA-1 に変換
+  J->>H: 先頭5文字だけを送る
+  H-->>J: 先頭5文字が同じハッシュの一覧
+  J->>J: 残りの35文字を、アプリの中で照らし合わせる
+  J->>A: 流出回数を保存
+```
 
 ### 4. XSS（クロスサイトスクリプティング）対策
 
@@ -136,6 +192,15 @@ VSCode でファイルを開いてコピーし直したところ、公開でき�
 ページの HTML を確認するとパスワードも入っていたため、ブラウザのパスワード保存機能が `<input type="password">` に反応していることが原因と考えました。
 詳細画面のパスワードは入力するものではないので、入力欄をやめて文字として表示する形に直したところ、解決しました。
 「どこまでは正しく動いているか」を1つずつ確かめると、原因をしぼり込めることを学びました。
+
+### 3. Rails を更新したら、Rails の中でエラーが出て起動しなかった
+
+サポートが終わった Rails 7.1 を 8.1 に上げるため、7.2 → 8.0 → 8.1 と1段階ずつ上げ、そのたびにテストを動かしました。
+8.1 にしたところ、`anonymous rest parameter is also used within block (SyntaxError)` というエラーで起動しなくなりました。
+エラーが出たファイルを見ると、自分のコードではなく Rails の中のファイルだったので、Rails ではなく Ruby の側に原因があると考えました。
+調べると、Ruby 3.3.0 には、名前のない引数（`*`）をブロックの中で使う書き方を、間違いとしてはじいてしまうバグがありました。
+Ruby を 4.0.2 に上げると起動し、脆弱性の警告も47件から0件になりました。
+エラーが「どのファイルで」起きているかを見ると、自分のコード・gem・Ruby のどこを直すべきかをしぼり込めることを学びました。
 
 ## Chrome 拡張機能の使い方
 
