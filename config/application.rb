@@ -9,7 +9,7 @@ Bundler.require(*Rails.groups)
 module PasswordKanriApp
   class Application < Rails::Application
     # Initialize configuration defaults for originally generated Rails version.
-    config.load_defaults 7.1
+    config.load_defaults 8.1
 
     # Please, add to the `ignore` list any other `lib` subdirectories that do
     # not contain `.rb` files, or that should not be reloaded or eager loaded.
@@ -24,6 +24,10 @@ module PasswordKanriApp
     # config.time_zone = "Central Time (US & Canada)"
     config.time_zone = "Tokyo"
     config.i18n.default_locale = :ja
+
+    # 画像を扱わないので、Active Storage の画像変換は使わない
+    config.active_storage.variant_processor = :disabled
+
     # config.eager_load_paths << Rails.root.join("extras")
   end
 end
