@@ -24,7 +24,7 @@ class Account < ApplicationRecord
     where("LOWER(service_name) LIKE ?", "%#{sanitize_sql_like(keyword.downcase)}%")
   }
 
-    # 過去に流出したことのあるもの
+  # 過去に流出したことのあるもの
   scope :pwned, -> { where("pwned_count > 0") }
 
   # パスワードの「指紋」を作る。暗号化したパスワードは毎回違う文字になり比べられないので、これで比べる

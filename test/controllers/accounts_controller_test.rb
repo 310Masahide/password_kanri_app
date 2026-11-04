@@ -186,7 +186,7 @@ class AccountsControllerTest < ActionDispatch::IntegrationTest
     assert_not_equal "application/json", response.media_type
   end
 
-    test "流出ありのアカウントだけにしぼり込める" do
+  test "流出ありのアカウントだけにしぼり込める" do
     sign_in @alice
     @alice_account.update_columns(pwned_count: 5, pwned_checked_at: Time.current)
     @alice.accounts.create!(service_name: "安全なサイト", password: "another-pass", pwned_count: 0, pwned_checked_at: Time.current)
