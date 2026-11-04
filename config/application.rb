@@ -28,6 +28,10 @@ module PasswordKanriApp
     # 画像を扱わないので、Active Storage の画像変換は使わない
     config.active_storage.variant_processor = :disabled
 
+    # ジョブは、Web サーバーと同じプロセスの中で動かす（無料の Render では、ジョブ専用のサーバーを用意できないため）
+    # サーバーが再起動すると予約したジョブは消えるが、一覧を開いたときに予約し直すので、チェックが漏れたままにはならない
+    config.active_job.queue_adapter = :async
+
     # config.eager_load_paths << Rails.root.join("extras")
   end
 end

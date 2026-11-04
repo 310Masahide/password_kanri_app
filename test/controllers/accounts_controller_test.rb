@@ -59,6 +59,34 @@ class AccountsControllerTest < ActionDispatch::IntegrationTest
     assert_select ".alert-warning", text: /ほかの1件のアカウントと同じパスワードです/
   end
 
+  test "一覧を開くと、7日以上前に調べたものの調べ直しを予約する" do
+    sign_in @alice
+    @alice_account.update_columns(pwned_checked_at: 8.days.ago)
+    assert_enqueued_with(job: PwnedCheckJob, args: [ @alice_account.id ]) do
+      get accounts_url
+    end
+    # 調べ直しが終わるまでは、前回の結果を表示したままにする
+    assert_select ".badge", text: "流出なし"
+  end
+
+  test "ゲストが一覧を開いても、調べ直しは予約しない" do
+    guest = User.guest
+    guest.reset_guest_samples!
+    guest.accounts.update_all(pwned_checked_at: 8.days.ago)
+    sign_in guest
+    assert_no_enqueued_jobs do
+      get accounts_url
+    end
+  end
+
+  test "登録した直後の詳細画面では、裏で確認中であることを伝える" do
+    sign_in @alice
+    post accounts_url, params: { account: { service_name: "新しいサービス", password: "test1234" } }
+    follow_redirect!
+    assert_select ".badge", text: "確認中"
+    assert_match "裏で確認しています", response.body
+  end
+
   test "再チェックのボタンで、流出チェックをやり直せる" do
     sign_in @alice
     PwnedPasswordChecker.stub(:count, 7) do

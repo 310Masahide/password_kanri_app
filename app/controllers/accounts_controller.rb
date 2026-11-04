@@ -5,6 +5,9 @@ class AccountsController < ApplicationController
 
   # GET /accounts
   def index
+    # 前に調べてから7日以上たったものを、裏で調べ直す（無料の Render では定期実行が使えないので、一覧を開いたときに行う）
+    # ゲストのサンプルは結果が決まっているので、API を呼ばない
+    current_user.accounts.request_due_pwned_checks! unless current_user.guest?
     @accounts = current_user.accounts.search(params[:q]).order(:service_name)
     @reused_fingerprints = current_user.accounts.reused_fingerprints
   end

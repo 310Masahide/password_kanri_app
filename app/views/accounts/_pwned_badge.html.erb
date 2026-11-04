@@ -1,4 +1,6 @@
-<% if account.pwned_count.nil? %>
+<% if account.pwned_check_pending? %>
+  <span class="badge text-bg-info">確認中</span>
+<% elsif account.pwned_count.nil? %>
   <span class="badge text-bg-secondary">未確認</span>
 <% elsif account.pwned_count > 0 %>
   <span class="badge text-bg-danger">流出あり</span>
