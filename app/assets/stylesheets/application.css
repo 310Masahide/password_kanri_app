@@ -19,3 +19,6 @@
 .mw-480 { max-width: 480px; }
 .mw-600 { max-width: 600px; }
 .mw-720 { max-width: 720px; }
+
+/* 二段階認証の QR コード（白い背景で、読み取りやすい大きさにする） */
+.qr-code { width: 200px; height: 200px; background: #fff; padding: 8px; }

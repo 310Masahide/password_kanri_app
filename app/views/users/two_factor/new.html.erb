@@ -1,0 +1,14 @@
+<div class="card shadow-sm mx-auto mw-420">
+  <div class="card-body p-4">
+    <h1 class="h4 mb-3 text-center">二段階認証</h1>
+    <p class="small text-muted">認証アプリに表示されている6桁のコードを入力してください。スマホをなくしたときは、予備コードも使えます。</p>
+
+    <%= form_with url: users_two_factor_path do |f| %>
+      <div class="mb-3">
+        <%= f.label :code, "コード", class: "form-label" %>
+        <%= f.text_field :code, autofocus: true, autocomplete: "one-time-code", inputmode: "numeric", class: "form-control", required: true %>
+      </div>
+      <%= f.submit "確認する", class: "btn btn-primary w-100" %>
+    <% end %>
+  </div>
+</div>

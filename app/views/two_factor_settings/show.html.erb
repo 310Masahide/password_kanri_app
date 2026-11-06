@@ -1,0 +1,38 @@
+<div class="card shadow-sm mx-auto mw-600">
+  <div class="card-body p-4">
+    <h1 class="h4 mb-3">二段階認証</h1>
+
+    <% if @recovery_codes.present? %>
+      <div class="alert alert-warning">
+        <p class="fw-bold mb-2">予備コード（この画面でしか表示しません）</p>
+        <p class="small mb-2">スマホをなくしたときに、コードの代わりに使えます。1つにつき1回だけ使えます。紙に書くなどして、安全な場所に保管してください。</p>
+        <ul class="list-unstyled font-monospace mb-0 row">
+          <% @recovery_codes.each do |code| %>
+            <li class="col-6"><%= code %></li>
+          <% end %>
+        </ul>
+      </div>
+    <% end %>
+
+    <% if current_user.otp_enabled? %>
+      <p><span class="badge text-bg-success">有効</span>
+        ログインのときに、パスワードに加えて認証アプリのコードを確かめています。</p>
+      <p class="small text-muted mb-4">
+        <%= l current_user.otp_enabled_at.to_date, format: :long %> に有効にしました。予備コードの残り：<%= current_user.otp_recovery_digests.size %>個
+      </p>
+
+      <h2 class="h6">二段階認証をやめる</h2>
+      <%= form_with url: two_factor_setting_path, method: :delete do |f| %>
+        <div class="mb-3">
+          <%= f.label :current_password, "ログインパスワード", class: "form-label" %>
+          <%= f.password_field :current_password, autocomplete: "current-password", class: "form-control", required: true %>
+        </div>
+        <%= f.submit "二段階認証をやめる", class: "btn btn-outline-danger" %>
+      <% end %>
+    <% else %>
+      <p><span class="badge text-bg-secondary">未設定</span>
+        ログインのときに、パスワードに加えて、スマホの認証アプリ（Google Authenticator など）のコードを確かめます。パスワードが漏れても、スマホがなければログインできません。</p>
+      <%= link_to "設定を始める", new_two_factor_setting_path, class: "btn btn-primary" %>
+    <% end %>
+  </div>
+</div>

@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_11_04_100000) do
+ActiveRecord::Schema[8.1].define(version: 2026_11_06_113624) do
   create_table "accounts", force: :cascade do |t|
     t.string "service_name"
     t.string "login_id"
@@ -50,6 +50,10 @@ ActiveRecord::Schema[8.1].define(version: 2026_11_04_100000) do
     t.datetime "updated_at", null: false
     t.integer "failed_attempts", default: 0, null: false
     t.datetime "locked_at"
+    t.string "otp_secret"
+    t.datetime "otp_enabled_at"
+    t.integer "otp_consumed_at"
+    t.text "otp_recovery_digests"
     t.index ["email"], name: "index_users_on_email", unique: true
     t.index ["reset_password_token"], name: "index_users_on_reset_password_token", unique: true
   end

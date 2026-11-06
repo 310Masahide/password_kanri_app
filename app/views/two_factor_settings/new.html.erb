@@ -1,0 +1,24 @@
+<div class="card shadow-sm mx-auto mw-600">
+  <div class="card-body p-4">
+    <h1 class="h4 mb-3">二段階認証の設定</h1>
+
+    <ol class="mb-4">
+      <li class="mb-2">スマホの認証アプリ（Google Authenticator など）で、この QR コードを読み取ります。</li>
+      <li>認証アプリに表示された6桁のコードを、下に入力します。</li>
+    </ol>
+
+    <div class="text-center mb-3">
+      <%= image_tag qr_code_data_url(@qr_code), class: "qr-code", alt: "二段階認証の QR コード" %>
+    </div>
+    <p class="small text-muted text-center">読み取れないときは、次の文字を認証アプリに入力してください。<br>
+      <code class="user-select-all"><%= @secret.scan(/.{1,4}/).join(" ") %></code></p>
+
+    <%= form_with url: two_factor_setting_path do |f| %>
+      <div class="mb-3">
+        <%= f.label :code, "認証アプリのコード", class: "form-label" %>
+        <%= f.text_field :code, autocomplete: "one-time-code", inputmode: "numeric", class: "form-control", required: true %>
+      </div>
+      <%= f.submit "有効にする", class: "btn btn-primary w-100" %>
+    <% end %>
+  </div>
+</div>

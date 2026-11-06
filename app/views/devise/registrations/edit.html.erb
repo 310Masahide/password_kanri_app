@@ -29,6 +29,14 @@
 
       <%= f.submit "変更する", class: "btn btn-primary w-100" %>
     <% end %>
+    <hr class="my-4">
+
+    <h2 class="h6">二段階認証</h2>
+    <p class="small text-muted">
+      <%= resource.otp_enabled? ? "有効です。" : "まだ設定していません。" %>
+      パスワードが漏れても、スマホがなければログインできないようにします。
+    </p>
+    <%= link_to "二段階認証の設定", two_factor_setting_path, class: "btn btn-sm btn-outline-primary" %>
 
     <hr class="my-4">
 
