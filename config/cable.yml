@@ -4,7 +4,6 @@ development:
 test:
   adapter: test
 
+# 本番も、Web サーバーと同じプロセスの中で知らせを届ける（サーバーが1台なので Redis はいらない）
 production:
-  adapter: redis
-  url: <%= ENV.fetch("REDIS_URL") { "redis://localhost:6379/1" } %>
-  channel_prefix: password_kanri_app_production
+  adapter: async

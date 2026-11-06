@@ -1,3 +1,6 @@
+<%# 流出チェックの結果が出たら、この画面を自動で読み込み直す %>
+<%= turbo_stream_from @account %>
+
 <%= render @account %>
 
 <div class="d-flex gap-2">

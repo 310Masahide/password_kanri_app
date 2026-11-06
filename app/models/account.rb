@@ -72,6 +72,14 @@ class Account < ApplicationRecord
     update!(pwned_count: count, pwned_checked_at: Time.current)
   end
 
+  # 流出チェックの結果が出たことを、開いている詳細画面と一覧に知らせる
+  # 送るのは「読み込み直して」という合図だけで、パスワードや結果は送らない
+  # 画面は、ログインしている本人の権限で読み込み直すので、ほかの人のデータは見えない
+  def broadcast_pwned_result
+    broadcast_refresh
+    broadcast_refresh_to user, :accounts
+  end
+
   # 裏で流出チェックをしている途中か
   def pwned_check_pending?
     pwned_count.nil? && pwned_check_requested_at.present? && pwned_check_requested_at > PWNED_RETRY_INTERVAL.ago

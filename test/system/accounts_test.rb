@@ -52,6 +52,22 @@ class AccountsTest < ApplicationSystemTestCase
     assert_equal "test1234", clipboard_text
   end
 
+  test "裏の流出チェックが終わると、読み込み直さなくても結果が表示される" do
+    sign_in @alice
+    @account.update_columns(pwned_count: nil, pwned_checked_at: nil, pwned_check_requested_at: Time.current)
+    visit account_path(@account)
+    assert_selector ".badge", text: "確認中"
+    # 画面が知らせを受け取る準備ができるまで待つ
+    assert_selector "turbo-cable-stream-source[connected]", visible: :all
+
+    PwnedPasswordChecker.stub(:count, 3) do
+      PwnedCheckJob.perform_now(@account.id)
+    end
+
+    assert_selector ".badge", text: "流出あり"
+    assert_text "過去に3回流出しています"
+  end
+
   test "削除は、確認でOKを押したときだけ行う" do
     sign_in @alice
     visit account_path(@account)

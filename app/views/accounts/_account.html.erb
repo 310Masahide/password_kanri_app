@@ -39,7 +39,7 @@
           <% if account.pwned_checked_at %>
             <span class="small text-muted"><%= l account.pwned_checked_at.to_date, format: :short %> に確認</span>
           <% elsif account.pwned_check_pending? %>
-            <span class="small text-muted">裏で確認しています。少したってから画面を読み込み直してください</span>
+            <span class="small text-muted">裏で確認しています。結果が出ると自動で表示されます。</span>
           <% end %>
           <%= button_to "今すぐ再チェック", recheck_account_path(account), class: "btn btn-sm btn-outline-secondary" %>
         </div>

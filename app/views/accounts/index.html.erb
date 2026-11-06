@@ -1,3 +1,6 @@
+<%# 流出チェックの結果が出たら、この画面を自動で読み込み直す %>
+<%= turbo_stream_from current_user, :accounts %>
+
 <div class="d-flex justify-content-between align-items-center mb-4">
   <h1 class="h3 mb-0">アカウント一覧</h1>
   <%= link_to "＋ 新規登録", new_account_path, class: "btn btn-primary" %>
