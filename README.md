@@ -1,5 +1,7 @@
 # 🔐 パスワード管理アプリ
 
+[![CI](https://github.com/310Masahide/password_kanri_app/actions/workflows/ci.yml/badge.svg)](https://github.com/310Masahide/password_kanri_app/actions/workflows/ci.yml)
+
 サービスごとのログインIDとパスワードを、暗号化してまとめて管理できる Web アプリです。
 登録したパスワードが過去に流出していないかを、外部 API を使って自動でチェックします。
 
@@ -11,8 +13,8 @@
 
 <img src="docs/images/index.png" alt="アカウント一覧" width="700">
 
-| 詳細画面 | 新規登録（パスワードの自動作成） |
-| --- | --- |
+| 詳細画面                                                    | 新規登録（パスワードの自動作成）                           |
+| ----------------------------------------------------------- | ---------------------------------------------------------- |
 | <img src="docs/images/show.png" alt="詳細画面" width="340"> | <img src="docs/images/new.png" alt="新規登録" width="340"> |
 
 ## 作った理由
@@ -41,17 +43,18 @@
 
 ## 使用技術
 
-| 分類                 | 技術                                                     |
-| -------------------- | -------------------------------------------------------- |
-| 言語・フレームワーク | Ruby 4.0.2 / Ruby on Rails 8.1                           |
-| 認証                 | Devise（日本語化：devise-i18n）                          |
-| 暗号化               | Active Record Encryption                                 |
-| フロントエンド       | Bootstrap 5.3 / Stimulus（Hotwire）                      |
-| 外部 API             | Have I Been Pwned（Pwned Passwords API）                 |
-| データベース         | SQLite（開発環境） / PostgreSQL（本番環境）              |
-| インフラ             | Render                                                   |
-| 拡張機能             | Chrome 拡張機能（Manifest V3） / トークン認証の JSON API |
-| テスト               | Minitest                                                 |
+| 分類                 | 技術                                                         |
+| -------------------- | ------------------------------------------------------------ |
+| 言語・フレームワーク | Ruby 4.0.2 / Ruby on Rails 8.1                               |
+| 認証                 | Devise（日本語化：devise-i18n）                              |
+| 暗号化               | Active Record Encryption                                     |
+| フロントエンド       | Bootstrap 5.3 / Stimulus（Hotwire）                          |
+| 外部 API             | Have I Been Pwned（Pwned Passwords API）                     |
+| データベース         | SQLite（開発環境） / PostgreSQL（本番環境）                  |
+| インフラ             | Render                                                       |
+| 拡張機能             | Chrome 拡張機能（Manifest V3） / トークン認証の JSON API     |
+| テスト               | Minitest                                                     |
+| CI                   | GitHub Actions（テスト・Brakeman・bundler-audit を自動実行） |
 
 ## テーブル設計
 
@@ -218,4 +221,3 @@ Ruby を 4.0.2 に上げると起動し、脆弱性の警告も47件から0件�
 - 拡張機能を Chrome ウェブストアで公開できる形に整える
 - アカウントを編集したときに、拡張機能の一覧にもすぐ反映させる
 - 裏での流出チェックが終わったら、画面を読み込み直さなくても結果が表示されるようにする（Turbo Streams）
-

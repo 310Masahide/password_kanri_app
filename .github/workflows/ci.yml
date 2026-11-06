@@ -1,0 +1,42 @@
+name: CI
+
+# GitHub にプッシュするたびに動かす（どのブランチでも）
+on: push
+
+# このワークフローには、コードを読む権限だけを与える
+permissions:
+  contents: read
+
+jobs:
+  test:
+    name: テスト
+    runs-on: ubuntu-latest
+    env:
+      RAILS_ENV: test
+      # 本番用の gem（pg）はテストで使わないので入れない
+      BUNDLE_WITHOUT: production
+    steps:
+      - uses: actions/checkout@v4
+      - uses: ruby/setup-ruby@v1
+        with:
+          # .ruby-version（4.0.2）を読み、bundle install の結果を次回のために保存する
+          bundler-cache: true
+      - name: データベースの準備
+        run: bin/rails db:test:prepare
+      - name: テストの実行
+        run: bin/rails test
+
+  security:
+    name: セキュリティチェック
+    runs-on: ubuntu-latest
+    env:
+      BUNDLE_WITHOUT: production
+    steps:
+      - uses: actions/checkout@v4
+      - uses: ruby/setup-ruby@v1
+        with:
+          bundler-cache: true
+      - name: Brakeman（コードの脆弱性）
+        run: bundle exec brakeman --no-pager
+      - name: bundler-audit（gem の脆弱性）
+        run: bundle exec bundle-audit check --update
