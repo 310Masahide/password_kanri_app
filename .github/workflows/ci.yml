@@ -25,6 +25,15 @@ jobs:
         run: bin/rails db:test:prepare
       - name: テストの実行
         run: bin/rails test
+      - name: 画面の自動テスト
+        run: bin/rails test:system
+      - name: 失敗したときの画面を保存
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: screenshots
+          path: tmp/screenshots
+          if-no-files-found: ignore
 
   security:
     name: セキュリティチェック

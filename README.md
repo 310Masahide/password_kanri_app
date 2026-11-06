@@ -53,7 +53,7 @@
 | データベース         | SQLite（開発環境） / PostgreSQL（本番環境）                  |
 | インフラ             | Render                                                       |
 | 拡張機能             | Chrome 拡張機能（Manifest V3） / トークン認証の JSON API     |
-| テスト               | Minitest                                                     |
+| テスト               | Minitest / システムテスト（Capybara・ヘッドレス Chrome）     | 
 | CI                   | GitHub Actions（テスト・Brakeman・bundler-audit を自動実行） |
 
 ## テーブル設計
