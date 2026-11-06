@@ -90,4 +90,25 @@ class TwoFactorTest < ActionDispatch::IntegrationTest
     log_in
     assert_redirected_to root_url
   end
+
+  test "ログイン画面を通さない送信（CSRF）では、コードの画面に進まない" do
+    ActionController::Base.allow_forgery_protection = true
+    log_in
+    assert_response :unprocessable_content
+    assert_nil session[:otp_user_id]
+  ensure
+    ActionController::Base.allow_forgery_protection = false
+  end
+
+  test "ログインしている人がもう一度ログインしても、コードの画面に進まない" do
+    sign_in @alice
+    log_in
+    assert_redirected_to root_url
+    assert_nil session[:otp_user_id]
+  end
+
+  test "形のおかしい送信でも、エラーの画面にならない" do
+    post user_session_url, params: { user: "x" }
+    assert_response :unprocessable_content
+  end
 end

@@ -1,6 +1,6 @@
 class Users::SessionsController < Devise::SessionsController
   # 二段階認証を使う人は、パスワードが合っていても、すぐにはログインさせない
-  prepend_before_action :start_two_factor, only: :create
+  before_action :start_two_factor, only: :create
 
   def guest_sign_in
     user = User.guest
@@ -16,11 +16,16 @@ class Users::SessionsController < Devise::SessionsController
   # 二段階認証を使う人だけ、ここでパスワードを確かめ、コードを入れる画面に進める
   # （使っていない人は、何もせずに Devise のいつものログインに進む）
   def start_two_factor
-    user = User.find_by(email: params.dig(:user, :email).to_s.strip.downcase)
+    # 形のおかしい送信は、Devise のいつもの処理に任せる（エラーの画面にしない）
+    login = params[:user]
+    return unless login.is_a?(ActionController::Parameters)
+
+    user = User.find_by(email: login[:email].to_s.strip.downcase)
+
     return unless user&.otp_enabled?
 
     # valid_for_authentication? は、失敗の回数を数えて、5回でロックする（いつものログインと同じ）
-    if user.valid_for_authentication? { user.valid_password?(params.dig(:user, :password).to_s) }
+    if user.valid_for_authentication? { user.valid_password?(login[:password].to_s) }
       session[:otp_user_id] = user.id
       session[:otp_started_at] = Time.current.to_i
       redirect_to new_users_two_factor_path
